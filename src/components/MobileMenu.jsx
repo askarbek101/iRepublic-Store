@@ -88,6 +88,15 @@ const MobileMenu = ({ isOpen, onClose }) => {
               Trade In
             </Link>
           </li>
+          <li>
+            <Link 
+              to="/compare" 
+              className="flex items-center px-6 h-[44px] text-xl text-white hover:text-[#2997FF] transition-colors"
+              onClick={onClose}
+            >
+              Сравнить
+            </Link>
+          </li>
         </ul>
       </div>
     </div>

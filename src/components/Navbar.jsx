@@ -97,6 +97,14 @@ const Navbar = () => {
                     Trade In
                   </Link>
                 </li>
+                <li className="h-full">
+                  <Link 
+                    to="/compare" 
+                    className="text-[#f5f5f7] text-[14px] font-normal opacity-80 hover:opacity-100 transition-opacity h-full flex items-center"
+                  >
+                    Сравнить
+                  </Link>
+                </li>
               </ul>
             )}
           </div>
