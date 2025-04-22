@@ -97,6 +97,15 @@ const MobileMenu = ({ isOpen, onClose }) => {
               Сравнить
             </Link>
           </li>
+          <li>
+            <Link 
+              to="/accessories" 
+              className="flex items-center px-6 h-[44px] text-xl text-white hover:text-[#2997FF] transition-colors"
+              onClick={onClose}
+            >
+              Аксессуары
+            </Link>
+          </li>
         </ul>
       </div>
     </div>

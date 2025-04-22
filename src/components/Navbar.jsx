@@ -105,6 +105,14 @@ const Navbar = () => {
                     Сравнить
                   </Link>
                 </li>
+                <li className="h-full">
+                  <Link 
+                    to="/accessories" 
+                    className="text-[#f5f5f7] text-[14px] font-normal opacity-80 hover:opacity-100 transition-opacity h-full flex items-center"
+                  >
+                    Аксессуары
+                  </Link>
+                </li>
               </ul>
             )}
           </div>

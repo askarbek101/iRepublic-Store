@@ -83,30 +83,29 @@ const NavIcon = ({ icon, title, link }) => (
 
 const navIcons = [
   {
-    icon: "/iconapple/IMG_4714.PNG",
-    title: "AirPods Pro",
-    link: "#airpods-pro"
-  },
-  {
-    icon: "/iconapple/IMG_4715.PNG",
+    icon: "/src/assets/icons/Airpods/icon_airpods_2gen_chargingcase__fj2joksyiiy6_small_2x.png",
     title: "AirPods",
     link: "#airpods"
   },
   {
-    icon: "/iconapple/IMG_4717.PNG",
+    icon: "/src/assets/icons/Airpods/icon_airpods_pro_case__m5lw3j5reluu_small_2x.png",
+    title: "AirPods Pro",
+    link: "#airpods-pro"
+  },
+  {
+    icon: "/src/assets/icons/Airpods/icon_airpods_max_smartcase__br0txis59ueu_small_2x.png",
     title: "AirPods Max",
     link: "#airpods-max"
   },
   {
-    icon: "/iconapple/IMG_4716.PNG",
-    title: "Музыка",
-    link: "#compare"
+    icon: "/src/assets/icons/Airpods/icon_airpods_max_smartcase__br0txis59ueu_small_2x.png",
+    title: "AirPods Max 2",
+    link: "#AirPodsMax"
   },
   {
-    icon: "/iconapple/IMG_4666.PNG",
-    title: "AirPods Max 2",
-    link: "#AirPodsMax",
-
+    icon: "/src/assets/icons/Airpods/icon_apple_music_lossless__bds953popohe_small_2x.png",
+    title: "Сравнить",
+    link: "#compare"
   }
 ];
 

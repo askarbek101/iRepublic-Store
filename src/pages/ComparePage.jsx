@@ -27,6 +27,22 @@ import CeramicShieldIcon from '../assets/icons/icon_ceramic_shield__esef7kqwglci
 import MagSafeIcon from '../assets/icons/icon_magsafe__cpwajrp6pnhy_large_2x.jpg';
 import SOSIcon from '../assets/icons/icon_sos__c2memf0o0oom_large_2x.jpg';
 
+// Watch icons
+import WatchRetina from '../assets/icons/Watch/icon_retina_display__c8aehjq3sb6u_large.png';
+import WatchRetinaAlwaysOn from '../assets/icons/Watch/icon_retina_display_always_on__l63nuwtqbh6e_large.png';
+import WatchHeart from '../assets/icons/Watch/icon_heart__c34gast9dd4y_large.png';
+import WatchVitals from '../assets/icons/Watch/icon_vitals__xdpxrz0jtv6u_large.png';
+import WatchSleep from '../assets/icons/Watch/icon_sleep__1y9s2efkfo26_large.png';
+import WatchCycle from '../assets/icons/Watch/icon_cycletracking__dq5phajha7ma_large.png';
+import WatchS9 from '../assets/icons/Watch/icon_sip_s9__cpk0pzu01eeu_large.png';
+import WatchS8 from '../assets/icons/Watch/icon_sip_s8__5r533zrb59eq_large.png';
+import WatchBattery from '../assets/icons/Watch/icon_battery__dimvijv601qq_large.png';
+import WatchBatteryFast from '../assets/icons/Watch/icon_battery_faster_charge__cuhhjgysh6i6_large.png';
+import WatchConnectivity from '../assets/icons/Watch/icon_connectivity__i9fjuem59k66_large.png';
+import WatchSOS from '../assets/icons/Watch/icon_sos__f5fuz1rxegeq_large.png';
+import WatchWater from '../assets/icons/Watch/icon_water_resistant__c7bt11bvqlme_large.png';
+import WatchCase from '../assets/icons/Watch/icon_case__e8dwot4qm0ya_large.png';
+
 const SpecIcons = {
   Display: DisplayIcon,
   DynamicIsland: DynamicIslandIcon,
@@ -50,7 +66,21 @@ const SpecIcons = {
   Lightning: LightningIcon,
   CeramicShield: CeramicShieldIcon,
   MagSafe: MagSafeIcon,
-  SOS: SOSIcon
+  SOS: SOSIcon,
+  WatchRetina: WatchRetina,
+  WatchRetinaAlwaysOn: WatchRetinaAlwaysOn,
+  WatchHeart: WatchHeart,
+  WatchVitals: WatchVitals,
+  WatchSleep: WatchSleep,
+  WatchCycle: WatchCycle,
+  WatchS9: WatchS9,
+  WatchS8: WatchS8,
+  WatchBattery: WatchBattery,
+  WatchBatteryFast: WatchBatteryFast,
+  WatchConnectivity: WatchConnectivity,
+  WatchSOS: WatchSOS,
+  WatchWater: WatchWater,
+  WatchCase: WatchCase
 };
 
 const CheckIcon = () => (
@@ -74,10 +104,13 @@ const ComparePage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [activeTab, setActiveTab] = useState('iphone');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    setSelectedProduct(null);
     fetchProducts();
-  }, []);
+  }, [activeTab]);
 
   // Add click outside listener to close dropdown
   useEffect(() => {
@@ -93,17 +126,60 @@ const ComparePage = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('https://admin-dashboard-qff2.vercel.app/api/product?category=iphone');
-      setProducts(response.data);
-      setLoading(false);
+      setLoading(true);
+      setError(null);
+      let category = '';
+      
+      // Определяем категорию
+      switch(activeTab) {
+        case 'iphone':
+          category = 'iphone';
+          break;
+        case 'airpods':
+          category = 'airpods';
+          break;
+        case 'watch':
+          category = 'apple-watch';
+          break;
+        default:
+          category = 'iphone';
+      }
+      
+      console.log('Fetching products for category:', category);
+      const url = `https://admin-dashboard-qff2.vercel.app/api/product?category=${category}`;
+      console.log('API URL:', url);
+      
+      const response = await axios.get(url);
+      console.log('API Response:', response);
+      console.log('Received products:', response.data);
+      
+      if (Array.isArray(response.data)) {
+        setProducts(response.data);
+      } else {
+        console.error('Received non-array data:', response.data);
+        setError('Получены некорректные данные');
+        setProducts([]);
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
+      console.error('Error details:', error.response?.data);
+      setError(error.message);
+      setProducts([]);
+    } finally {
       setLoading(false);
     }
   };
 
   const handleModelSelect = (product) => {
+    console.log('Selected product:', product);
     setSelectedProduct(product);
+    setOpenDropdown(false);
+  };
+
+  const handleTabChange = (tab) => {
+    console.log('Changing tab to:', tab);
+    setActiveTab(tab);
+    setSelectedProduct(null);
     setOpenDropdown(false);
   };
 
@@ -111,13 +187,19 @@ const ComparePage = () => {
     if (!product || !product.model) return SpecIcons.ChipA18;
     
     const model = product.model.toLowerCase();
-    if (model.includes('11')) return SpecIcons.ChipA13;
-    if (model.includes('12')) return SpecIcons.ChipA14;
-    if (model.includes('13')) return SpecIcons.ChipA15;
-    if (model.includes('14')) return SpecIcons.ChipA16;
-    if (model.includes('15')) return SpecIcons.ChipA17;
-    if (model.includes('16 pro') || model.includes('16 pro max')) return SpecIcons.ChipA18;
+    if (model.includes('16 pro max') || model.includes('16 pro')) return SpecIcons.ChipA18;
     if (model.includes('16')) return SpecIcons.ChipA17;
+    if (model.includes('15 pro max') || model.includes('15 pro')) return SpecIcons.ChipA17;
+    if (model.includes('15')) return SpecIcons.ChipA16;
+    if (model.includes('14 pro max') || model.includes('14 pro')) return SpecIcons.ChipA16;
+    if (model.includes('14')) return SpecIcons.ChipA15;
+    if (model.includes('13 pro max') || model.includes('13 pro')) return SpecIcons.ChipA15;
+    if (model.includes('13')) return SpecIcons.ChipA15;
+    if (model.includes('12 pro max') || model.includes('12 pro')) return SpecIcons.ChipA14;
+    if (model.includes('12')) return SpecIcons.ChipA14;
+    if (model.includes('11 pro max') || model.includes('11 pro')) return SpecIcons.ChipA13;
+    if (model.includes('11')) return SpecIcons.ChipA13;
+    if (model.includes('se')) return SpecIcons.ChipA15;
     return SpecIcons.ChipA18;
   };
 
@@ -211,9 +293,16 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return '—';
             const model = product.model.toLowerCase();
-            if (model.includes('16 pro') || model.includes('16 pro max') || 
-                model.includes('15 pro') || model.includes('15 pro max')) return '48 Мп';
-            if (model.includes('14 pro') || model.includes('14 pro max')) return '48 Мп';
+            if (model.includes('16 pro') || model.includes('15 pro')) return '48 Мп, ƒ/1.78';
+            if (model.includes('16') || model.includes('15')) return '48 Мп, ƒ/1.6';
+            if (model.includes('14 pro') || model.includes('14 pro max')) return '48 Мп, ƒ/1.78';
+            if (model.includes('14') || model.includes('14 plus')) return '12 Мп, ƒ/1.5';
+            if (model.includes('13 pro') || model.includes('13 pro max')) return '12 Мп, ƒ/1.5';
+            if (model.includes('13') || model.includes('13 mini')) return '12 Мп, ƒ/1.6';
+            if (model.includes('12 pro') || model.includes('12 pro max')) return '12 Мп, ƒ/1.6';
+            if (model.includes('12') || model.includes('12 mini')) return '12 Мп, ƒ/1.6';
+            if (model.includes('11 pro') || model.includes('11 pro max')) return '12 Мп, ƒ/1.8';
+            if (model.includes('11')) return '12 Мп, ƒ/1.8';
             return '12 Мп';
           }
         },
@@ -225,10 +314,17 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return '—';
             const model = product.model.toLowerCase();
-            if (model.includes('16 pro') || model.includes('16 pro max') || 
-                model.includes('15 pro') || model.includes('15 pro max')) return '12 Мп';
-            if (model.includes('14 pro') || model.includes('14 pro max')) return '12 Мп';
-            return '12 Мп';
+            if (model.includes('16 pro') || model.includes('15 pro')) return '12 Мп, ƒ/2.2, 120°';
+            if (model.includes('16') || model.includes('15')) return '12 Мп, ƒ/2.4, 120°';
+            if (model.includes('14 pro') || model.includes('14 pro max')) return '12 Мп, ƒ/2.2, 120°';
+            if (model.includes('14') || model.includes('14 plus')) return '12 Мп, ƒ/2.4, 120°';
+            if (model.includes('13 pro') || model.includes('13 pro max')) return '12 Мп, ƒ/1.8, 120°';
+            if (model.includes('13') || model.includes('13 mini')) return '12 Мп, ƒ/2.4, 120°';
+            if (model.includes('12 pro') || model.includes('12 pro max')) return '12 Мп, ƒ/2.4, 120°';
+            if (model.includes('12') || model.includes('12 mini')) return '12 Мп, ƒ/2.4, 120°';
+            if (model.includes('11 pro') || model.includes('11 pro max')) return '12 Мп, ƒ/2.4, 120°';
+            if (model.includes('11')) return '12 Мп, ƒ/2.4, 120°';
+            return '—';
           }
         },
         { 
@@ -239,10 +335,14 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return '—';
             const model = product.model.toLowerCase();
-            if (model.includes('16 pro') || model.includes('16 pro max') || 
-                model.includes('15 pro') || model.includes('15 pro max')) return '12 Мп';
-            if (model.includes('14 pro') || model.includes('14 pro max')) return '12 Мп';
-            if (model.includes('13 pro') || model.includes('13 pro max')) return '12 Мп';
+            if (model.includes('16 pro max') || model.includes('15 pro max')) return '12 Мп, ƒ/2.8, 5x оптический зум';
+            if (model.includes('16 pro') || model.includes('15 pro')) return '12 Мп, ƒ/2.8, 3x оптический зум';
+            if (model.includes('14 pro max')) return '12 Мп, ƒ/2.8, 3x оптический зум';
+            if (model.includes('14 pro')) return '12 Мп, ƒ/2.8, 3x оптический зум';
+            if (model.includes('13 pro max')) return '12 Мп, ƒ/2.8, 3x оптический зум';
+            if (model.includes('13 pro')) return '12 Мп, ƒ/2.8, 3x оптический зум';
+            if (model.includes('12 pro max')) return '12 Мп, ƒ/2.2, 2.5x оптический зум';
+            if (model.includes('12 pro')) return '12 Мп, ƒ/2.0, 2x оптический зум';
             return '—';
           }
         },
@@ -260,6 +360,8 @@ const ComparePage = () => {
             if (model.includes('14 pro')) return '3x';
             if (model.includes('13 pro max')) return '3x';
             if (model.includes('13 pro')) return '3x';
+            if (model.includes('12 pro max')) return '2.5x';
+            if (model.includes('12 pro')) return '2x';
             return '—';
           }
         },
@@ -271,7 +373,8 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return false;
             const model = product.model.toLowerCase();
-            return model.includes('pro') || model.includes('15') || model.includes('16');
+            if (model.includes('16 pro max') || model.includes('16 pro') || model.includes('16')) return true;
+            return false;
           }
         }
       ]
@@ -289,13 +392,19 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return '—';
             const model = product.model.toLowerCase();
-            if (model.includes('11')) return 'A13 Bionic';
-            if (model.includes('12')) return 'A14 Bionic';
-            if (model.includes('13')) return 'A15 Bionic';
-            if (model.includes('14')) return 'A16 Bionic';
-            if (model.includes('15')) return 'A17 Pro';
-            if (model.includes('16 pro') || model.includes('16 pro max')) return 'A18 Pro';
+            if (model.includes('16 pro max') || model.includes('16 pro')) return 'A18 Pro';
             if (model.includes('16')) return 'A17 Pro';
+            if (model.includes('15 pro max') || model.includes('15 pro')) return 'A17 Pro';
+            if (model.includes('15')) return 'A16 Bionic';
+            if (model.includes('14 pro max') || model.includes('14 pro')) return 'A16 Bionic';
+            if (model.includes('14')) return 'A15 Bionic';
+            if (model.includes('13 pro max') || model.includes('13 pro')) return 'A15 Bionic';
+            if (model.includes('13')) return 'A15 Bionic';
+            if (model.includes('12 pro max') || model.includes('12 pro')) return 'A14 Bionic';
+            if (model.includes('12')) return 'A14 Bionic';
+            if (model.includes('11 pro max') || model.includes('11 pro')) return 'A13 Bionic';
+            if (model.includes('11')) return 'A13 Bionic';
+            if (model.includes('se')) return 'A15 Bionic';
             return '—';
           }
         },
@@ -304,7 +413,12 @@ const ComparePage = () => {
           label: '6 ядер CPU (2+4)', 
           type: 'boolean',
           getIcon: (product) => getChipIcon(product),
-          getValue: (product) => true
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('11') || model.includes('12') || model.includes('13') || 
+                   model.includes('14') || model.includes('15') || model.includes('16');
+          }
         },
         { 
           key: 'gpuCores', 
@@ -314,10 +428,8 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return false;
             const model = product.model.toLowerCase();
-            return model.includes('13 pro') || 
-                   model.includes('14') || 
-                   model.includes('15') || 
-                   model.includes('16');
+            return model.includes('13 pro') || model.includes('14') || 
+                   model.includes('15') || model.includes('16');
           }
         },
         { 
@@ -328,9 +440,7 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return false;
             const model = product.model.toLowerCase();
-            return model.includes('11') || 
-                   model.includes('12') || 
-                   model.includes('13');
+            return model.includes('11') || model.includes('12') || model.includes('13');
           }
         },
         { 
@@ -341,10 +451,8 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return false;
             const model = product.model.toLowerCase();
-            return model.includes('13 pro') || 
-                   model.includes('14') || 
-                   model.includes('15') || 
-                   model.includes('16');
+            return model.includes('13 pro') || model.includes('14') || 
+                   model.includes('15') || model.includes('16');
           }
         },
         { 
@@ -355,29 +463,55 @@ const ComparePage = () => {
           getValue: (product) => {
             if (!product || !product.model) return false;
             const model = product.model.toLowerCase();
-            return model.includes('11') || 
-                   model.includes('12') || 
-                   model.includes('13');
+            return model.includes('11') || model.includes('12') || model.includes('13');
           }
         },
         { 
           key: 'transistors', 
           label: 'Количество транзисторов', 
-          type: 'boolean',
+          type: 'text',
           getIcon: (product) => getChipIcon(product),
           getValue: (product) => {
-            if (!product || !product.processor) return false;
-            return true;
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('16 pro max') || model.includes('16 pro')) return '19 млрд';
+            if (model.includes('16')) return '19 млрд';
+            if (model.includes('15 pro max') || model.includes('15 pro')) return '19 млрд';
+            if (model.includes('15')) return '16 млрд';
+            if (model.includes('14 pro max') || model.includes('14 pro')) return '16 млрд';
+            if (model.includes('14')) return '15 млрд';
+            if (model.includes('13 pro max') || model.includes('13 pro')) return '15 млрд';
+            if (model.includes('13')) return '15 млрд';
+            if (model.includes('12 pro max') || model.includes('12 pro')) return '11.8 млрд';
+            if (model.includes('12')) return '11.8 млрд';
+            if (model.includes('11 pro max') || model.includes('11 pro')) return '8.5 млрд';
+            if (model.includes('11')) return '8.5 млрд';
+            if (model.includes('se')) return '15 млрд';
+            return '—';
           }
         },
         { 
           key: 'process', 
           label: 'Техпроцесс', 
-          type: 'boolean',
+          type: 'text',
           getIcon: (product) => getChipIcon(product),
           getValue: (product) => {
-            if (!product || !product.processor) return false;
-            return true;
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('16 pro max') || model.includes('16 pro')) return '3 нм';
+            if (model.includes('16')) return '3 нм';
+            if (model.includes('15 pro max') || model.includes('15 pro')) return '3 нм';
+            if (model.includes('15')) return '4 нм';
+            if (model.includes('14 pro max') || model.includes('14 pro')) return '4 нм';
+            if (model.includes('14')) return '5 нм';
+            if (model.includes('13 pro max') || model.includes('13 pro')) return '5 нм';
+            if (model.includes('13')) return '5 нм';
+            if (model.includes('12 pro max') || model.includes('12 pro')) return '5 нм';
+            if (model.includes('12')) return '5 нм';
+            if (model.includes('11 pro max') || model.includes('11 pro')) return '7 нм';
+            if (model.includes('11')) return '7 нм';
+            if (model.includes('se')) return '5 нм';
+            return '—';
           }
         }
       ]
@@ -389,17 +523,91 @@ const ComparePage = () => {
       subSpecs: [
         { 
           key: 'batteryLife', 
-          label: 'Время работы', 
+          label: 'Время работы при воспроизведении видео', 
           type: 'text',
           icon: SpecIcons.Battery,
           getValue: (product) => {
             if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('16 pro max') || model.includes('15 pro max')) return 'До 29 часов';
+            if (model.includes('16 pro') || model.includes('15 pro')) return 'До 23 часов';
+            if (model.includes('16 plus') || model.includes('15 plus')) return 'До 26 часов';
+            if (model.includes('16') || model.includes('15')) return 'До 20 часов';
+            if (model.includes('14 pro max')) return 'До 29 часов';
+            if (model.includes('14 pro')) return 'До 23 часов';
+            if (model.includes('14 plus')) return 'До 26 часов';
+            if (model.includes('14')) return 'До 20 часов';
+            if (model.includes('13 pro max')) return 'До 28 часов';
+            if (model.includes('13 pro')) return 'До 22 часов';
+            if (model.includes('13')) return 'До 19 часов';
+            if (model.includes('12 pro max')) return 'До 20 часов';
+            if (model.includes('12 pro')) return 'До 17 часов';
+            if (model.includes('12')) return 'До 17 часов';
+            if (model.includes('11 pro max')) return 'До 20 часов';
+            if (model.includes('11 pro')) return 'До 18 часов';
+            if (model.includes('11')) return 'До 17 часов';
             return 'До 19 часов';
           }
         },
         { 
+          key: 'batteryLifeStreaming', 
+          label: 'Время работы при потоковом видео', 
+          type: 'text',
+          icon: SpecIcons.Battery,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('16 pro max') || model.includes('15 pro max')) return 'До 25 часов';
+            if (model.includes('16 pro') || model.includes('15 pro')) return 'До 20 часов';
+            if (model.includes('16 plus') || model.includes('15 plus')) return 'До 20 часов';
+            if (model.includes('16') || model.includes('15')) return 'До 16 часов';
+            if (model.includes('14 pro max')) return 'До 25 часов';
+            if (model.includes('14 pro')) return 'До 20 часов';
+            if (model.includes('14 plus')) return 'До 20 часов';
+            if (model.includes('14')) return 'До 16 часов';
+            if (model.includes('13 pro max')) return 'До 25 часов';
+            if (model.includes('13 pro')) return 'До 20 часов';
+            if (model.includes('13')) return 'До 15 часов';
+            if (model.includes('12 pro max')) return 'До 12 часов';
+            if (model.includes('12 pro')) return 'До 11 часов';
+            if (model.includes('12')) return 'До 11 часов';
+            if (model.includes('11 pro max')) return 'До 12 часов';
+            if (model.includes('11 pro')) return 'До 11 часов';
+            if (model.includes('11')) return 'До 10 часов';
+            return 'До 15 часов';
+          }
+        },
+        { 
+          key: 'batteryLifeAudio', 
+          label: 'Время работы при воспроизведении аудио', 
+          type: 'text',
+          icon: SpecIcons.Battery,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('16 pro max') || model.includes('15 pro max')) return 'До 95 часов';
+            if (model.includes('16 pro') || model.includes('15 pro')) return 'До 75 часов';
+            if (model.includes('16 plus') || model.includes('15 plus')) return 'До 100 часов';
+            if (model.includes('16') || model.includes('15')) return 'До 80 часов';
+            if (model.includes('14 pro max')) return 'До 95 часов';
+            if (model.includes('14 pro')) return 'До 75 часов';
+            if (model.includes('14 plus')) return 'До 100 часов';
+            if (model.includes('14')) return 'До 80 часов';
+            if (model.includes('13 pro max')) return 'До 95 часов';
+            if (model.includes('13 pro')) return 'До 75 часов';
+            if (model.includes('13')) return 'До 75 часов';
+            if (model.includes('12 pro max')) return 'До 80 часов';
+            if (model.includes('12 pro')) return 'До 65 часов';
+            if (model.includes('12')) return 'До 65 часов';
+            if (model.includes('11 pro max')) return 'До 80 часов';
+            if (model.includes('11 pro')) return 'До 65 часов';
+            if (model.includes('11')) return 'До 65 часов';
+            return 'До 75 часов';
+          }
+        },
+        { 
           key: 'fastCharging', 
-          label: 'Быстрая зарядка', 
+          label: 'Быстрая зарядка (до 50% за 30 минут)', 
           type: 'boolean',
           icon: SpecIcons.Lightning,
           getValue: (product) => {
@@ -421,7 +629,15 @@ const ComparePage = () => {
           getIcon: (product) => getNetworkIcon(product),
           getValue: (product) => {
             if (!product || !product.model) return '—';
-            return '5G';
+            const model = product.model.toLowerCase();
+            if (model.includes('16 pro max') || model.includes('16 pro') || model.includes('16')) return '5G (sub-6 ГГц и mmWave)';
+            if (model.includes('15 pro max') || model.includes('15 pro') || model.includes('15')) return '5G (sub-6 ГГц и mmWave)';
+            if (model.includes('14 pro max') || model.includes('14 pro') || model.includes('14')) return '5G (sub-6 ГГц и mmWave)';
+            if (model.includes('13 pro max') || model.includes('13 pro') || model.includes('13')) return '5G (sub-6 ГГц и mmWave)';
+            if (model.includes('12 pro max') || model.includes('12 pro') || model.includes('12')) return '5G (sub-6 ГГц и mmWave)';
+            if (model.includes('11 pro max') || model.includes('11 pro') || model.includes('11')) return '4G LTE';
+            if (model.includes('se')) return '4G LTE';
+            return '4G LTE';
           }
         },
         { 
@@ -431,7 +647,8 @@ const ComparePage = () => {
           icon: SpecIcons.MagSafe,
           getValue: (product) => {
             if (!product || !product.model) return false;
-            return true;
+            const model = product.model.toLowerCase();
+            return model.includes('12') || model.includes('13') || model.includes('14') || model.includes('15') || model.includes('16');
           }
         },
         { 
@@ -439,7 +656,11 @@ const ComparePage = () => {
           label: 'USB-C', 
           type: 'boolean',
           icon: SpecIcons.USBC,
-          getValue: (product) => true
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('15') || model.includes('16');
+          }
         }
       ]
     },
@@ -455,7 +676,8 @@ const ComparePage = () => {
           icon: SpecIcons.FaceID,
           getValue: (product) => {
             if (!product || !product.model) return false;
-            return true;
+            const model = product.model.toLowerCase();
+            return model.includes('pro') || model.includes('12') || model.includes('13') || model.includes('14') || model.includes('15') || model.includes('16');
           }
         },
         { 
@@ -465,7 +687,8 @@ const ComparePage = () => {
           icon: SpecIcons.SOS,
           getValue: (product) => {
             if (!product || !product.model) return false;
-            return true;
+            const model = product.model.toLowerCase();
+            return model.includes('14') || model.includes('15') || model.includes('16');
           }
         },
         { 
@@ -473,7 +696,14 @@ const ComparePage = () => {
           label: 'Обнаружение аварий', 
           type: 'boolean',
           icon: SpecIcons.SOS,
-          getValue: (product) => true
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            if (model.includes('16 pro max') || model.includes('16 pro') || model.includes('16')) return true;
+            if (model.includes('15 pro max') || model.includes('15 pro') || model.includes('15')) return true;
+            if (model.includes('14 pro max') || model.includes('14 pro') || model.includes('14')) return true;
+            return false;
+          }
         }
       ]
     },
@@ -496,6 +726,632 @@ const ComparePage = () => {
     }
   ];
 
+  const airpodsComparisonSpecs = [
+    {
+      key: 'sound',
+      label: 'Звук',
+      getIcon: () => '/src/assets/icons/Airpods/icon_spatialaudio__ctgtjv3iqq82_small_2x.png',
+      subSpecs: [
+        {
+          key: 'spatialAudio',
+          label: 'Пространственное аудио',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_spatialaudio__ctgtjv3iqq82_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro') || model.includes('max');
+          }
+        },
+        {
+          key: 'noiseCancellation',
+          label: 'Активное шумоподавление',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_hearing_health__d70zg3te83sm_large_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro') || model.includes('max');
+          }
+        },
+        {
+          key: 'adaptiveEQ',
+          label: 'Адаптивный эквалайзер',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_controls_force_swipe__rkkniki9aeyy_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        },
+        {
+          key: 'conversationAwareness',
+          label: 'Осведомленность о разговоре',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_conversation_awareness__68gbdvjcl76m_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro') || model.includes('max');
+          }
+        }
+      ]
+    },
+    {
+      key: 'battery',
+      label: 'Аккумулятор',
+      getIcon: () => '/src/assets/icons/Airpods/icon_batterytime__cxshqzcbx0cy_small_2x.png',
+      subSpecs: [
+        {
+          key: 'batteryLife',
+          label: 'Время работы',
+          type: 'text',
+          icon: '/src/assets/icons/Airpods/icon_batterytime__cxshqzcbx0cy_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('max')) return 'До 20 часов';
+            if (model.includes('pro')) return 'До 6 часов';
+            if (model.includes('3gen')) return 'До 6 часов';
+            return 'До 5 часов';
+          }
+        },
+        {
+          key: 'fastCharging',
+          label: 'Быстрая зарядка',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_batterytime__cxshqzcbx0cy_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro') || model.includes('max') || model.includes('3gen');
+          }
+        },
+        {
+          key: 'wirelessCharging',
+          label: 'Беспроводная зарядка',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_batterytime__cxshqzcbx0cy_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return !model.includes('2gen');
+          }
+        }
+      ]
+    },
+    {
+      key: 'protection',
+      label: 'Защита',
+      getIcon: () => '/src/assets/icons/Airpods/icon_sweatwaterresistance__wd53s2nrgz2e_small_2x.png',
+      subSpecs: [
+        {
+          key: 'waterResistance',
+          label: 'Влагозащита IPX4',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_sweatwaterresistance__wd53s2nrgz2e_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro');
+          }
+        },
+        {
+          key: 'sweatResistance',
+          label: 'Устойчивость к поту',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_sweatwaterresistance__wd53s2nrgz2e_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        }
+      ]
+    },
+    {
+      key: 'controls',
+      label: 'Управление',
+      getIcon: () => '/src/assets/icons/Airpods/icon_force_sensor__eadtuejtmmc2_small_2x.png',
+      subSpecs: [
+        {
+          key: 'forceSensor',
+          label: 'Сенсор нажатия',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_force_sensor__eadtuejtmmc2_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro');
+          }
+        },
+        {
+          key: 'touchControl',
+          label: 'Сенсорное управление',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_touch_control__gcndbb17ryi6_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        }
+      ]
+    },
+    {
+      key: 'features',
+      label: 'Функции',
+      getIcon: () => '/src/assets/icons/Airpods/icon_autoswitch__d54x8lxyl0gi_small_2x.png',
+      subSpecs: [
+        {
+          key: 'autoSwitch',
+          label: 'Автоматическое переключение',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_autoswitch__d54x8lxyl0gi_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        },
+        {
+          key: 'heySiri',
+          label: 'Hey Siri',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_heysiri__gg2lf80rdfu6_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        },
+        {
+          key: 'siri',
+          label: 'Siri',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_siri__215cs0g5x4ya_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        },
+        {
+          key: 'personalizedEngraving',
+          label: 'Персональная гравировка',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_personalizedengraving__fh8jv8fykweq_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        }
+      ]
+    },
+    {
+      key: 'case',
+      label: 'Кейс',
+      getIcon: () => '/src/assets/icons/Airpods/icon_airpods_pro_case__m5lw3j5reluu_small_2x.png',
+      subSpecs: [
+        {
+          key: 'smartCase',
+          label: 'Умный кейс',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_airpods_max_smartcase__br0txis59ueu_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('max');
+          }
+        },
+        {
+          key: 'chargingCase',
+          label: 'Кейс с зарядкой',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_airpods_2gen_chargingcase__fj2joksyiiy6_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return !model.includes('max');
+          }
+        },
+        {
+          key: 'wirelessChargingCase',
+          label: 'Кейс с беспроводной зарядкой',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_airpods_pro_case__m5lw3j5reluu_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro') || model.includes('3gen');
+          }
+        }
+      ]
+    },
+    {
+      key: 'chip',
+      label: 'Чип',
+      getIcon: () => '/src/assets/icons/Airpods/icon_h2chip__cuvhf536qzue_small_2x.png',
+      subSpecs: [
+        {
+          key: 'h2Chip',
+          label: 'Чип H2',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_h2chip__cuvhf536qzue_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('pro') || model.includes('max');
+          }
+        },
+        {
+          key: 'h1Chip',
+          label: 'Чип H1',
+          type: 'boolean',
+          icon: '/src/assets/icons/Airpods/icon_h1chip__e0glsiaicfqu_small_2x.png',
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('3gen') || model.includes('2gen');
+          }
+        }
+      ]
+    }
+  ];
+
+  const watchComparisonSpecs = [
+    {
+      key: 'display',
+      label: 'Дисплей',
+      getIcon: () => SpecIcons.WatchRetina,
+      subSpecs: [
+        {
+          key: 'retinaDisplay',
+          label: 'Дисплей Retina LTPO OLED',
+          type: 'text',
+          icon: SpecIcons.WatchRetina,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10')) return 'До 3000 нит, Always-On, с технологией ProMotion';
+            if (model.includes('ultra 2')) return 'До 3000 нит, Always-On';
+            if (model.includes('ultra')) return 'До 2000 нит, Always-On';
+            if (model.includes('series 9')) return 'До 2000 нит, Always-On';
+            if (model.includes('series 8')) return 'До 1000 нит, Always-On';
+            if (model.includes('series 7')) return 'До 1000 нит, Always-On';
+            if (model.includes('se 2')) return 'До 1000 нит';
+            return '—';
+          }
+        },
+        {
+          key: 'displaySize',
+          label: 'Размер дисплея',
+          type: 'text',
+          icon: SpecIcons.WatchRetina,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10')) return '47 мм или 51 мм';
+            if (model.includes('ultra')) return '49 мм';
+            if (model.includes('45mm')) return '45 мм';
+            if (model.includes('44mm')) return '44 мм';
+            if (model.includes('41mm')) return '41 мм';
+            if (model.includes('40mm')) return '40 мм';
+            return '—';
+          }
+        }
+      ]
+    },
+    {
+      key: 'processor',
+      label: 'Процессор',
+      getIcon: () => SpecIcons.WatchS9,
+      subSpecs: [
+        {
+          key: 'chip',
+          label: 'Процессор',
+          type: 'text',
+          icon: SpecIcons.WatchS9,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10')) 
+              return 'S10 SiP с 64-битным двухъядерным процессором и 8-ядерным Neural Engine';
+            if (model.includes('series 9') || model.includes('ultra 2')) 
+              return 'S9 SiP с 64-битным двухъядерным процессором и 4-ядерным Neural Engine';
+            if (model.includes('series 8') || model.includes('ultra') || model.includes('se 2')) 
+              return 'S8 SiP с 64-битным двухъядерным процессором';
+            if (model.includes('series 7')) 
+              return 'S7 SiP с 64-битным двухъядерным процессором';
+            return '—';
+          }
+        }
+      ]
+    },
+    {
+      key: 'battery',
+      label: 'Аккумулятор',
+      getIcon: () => SpecIcons.WatchBattery,
+      subSpecs: [
+        {
+          key: 'batteryLifeNormal',
+          label: 'Время работы в обычном режиме',
+          type: 'text',
+          icon: SpecIcons.WatchBattery,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10')) 
+              return 'До 24 часов при обычном использовании, до 48 часов в режиме энергосбережения';
+            if (model.includes('ultra 2') || model.includes('ultra')) 
+              return 'До 36 часов при обычном использовании, до 72 часов в режиме энергосбережения';
+            if (model.includes('series 9') || model.includes('series 8')) 
+              return 'До 18 часов при обычном использовании, до 36 часов в режиме энергосбережения';
+            if (model.includes('series 7')) 
+              return 'До 18 часов при обычном использовании';
+            if (model.includes('se 2')) 
+              return 'До 18 часов при обычном использовании, до 36 часов в режиме энергосбережения';
+            return '—';
+          }
+        },
+        {
+          key: 'fastCharging',
+          label: 'Быстрая зарядка',
+          type: 'text',
+          icon: SpecIcons.WatchBatteryFast,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10'))
+              return '0-80% за 30 минут, полная зарядка за 60 минут';
+            if (model.includes('ultra 2') || model.includes('ultra')) 
+              return '0-80% за 60 минут, полная зарядка за 90 минут';
+            if (model.includes('series 9') || model.includes('series 8') || model.includes('series 7')) 
+              return '0-80% за 45 минут, полная зарядка за 75 минут';
+            if (model.includes('se 2')) 
+              return '0-80% за 45 минут, полная зарядка за 90 минут';
+            return '—';
+          }
+        }
+      ]
+    },
+    {
+      key: 'health',
+      label: 'Здоровье',
+      getIcon: () => SpecIcons.WatchHeart,
+      subSpecs: [
+        {
+          key: 'heartRate',
+          label: 'Датчик пульса',
+          type: 'boolean',
+          icon: SpecIcons.WatchHeart,
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            return true;
+          }
+        },
+        {
+          key: 'vitals',
+          label: 'Мониторинг показателей здоровья',
+          type: 'text',
+          icon: SpecIcons.WatchVitals,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10'))
+              return 'ЭКГ, SpO2, температура тела, давление, уровень стресса';
+            if (model.includes('series 9') || model.includes('ultra 2'))
+              return 'ЭКГ, SpO2, температура тела, давление';
+            if (model.includes('series 8') || model.includes('ultra'))
+              return 'ЭКГ, SpO2, температура тела';
+            if (model.includes('series 7'))
+              return 'ЭКГ, SpO2';
+            return 'Базовый мониторинг';
+          }
+        },
+        {
+          key: 'sleep',
+          label: 'Отслеживание сна',
+          type: 'text',
+          icon: SpecIcons.WatchSleep,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10'))
+              return 'Расширенный анализ фаз сна и качества отдыха';
+            return 'Базовое отслеживание сна';
+          }
+        }
+      ]
+    },
+    {
+      key: 'connectivity',
+      label: 'Подключение',
+      getIcon: () => SpecIcons.WatchConnectivity,
+      subSpecs: [
+        {
+          key: 'cellular',
+          label: 'Cellular',
+          type: 'boolean',
+          icon: SpecIcons.WatchConnectivity,
+          getValue: (product) => {
+            if (!product || !product.model) return false;
+            const model = product.model.toLowerCase();
+            return model.includes('cellular');
+          }
+        },
+        {
+          key: 'bluetooth',
+          label: 'Bluetooth версия',
+          type: 'text',
+          icon: SpecIcons.WatchConnectivity,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10')) return '5.3 с поддержкой LE Audio';
+            if (model.includes('series 9') || model.includes('ultra 2')) return '5.3';
+            if (model.includes('series 8') || model.includes('ultra') || 
+                model.includes('series 7') || model.includes('se 2')) return '5.0';
+            return '—';
+          }
+        },
+        {
+          key: 'wifi',
+          label: 'Wi-Fi',
+          type: 'text',
+          icon: SpecIcons.WatchConnectivity,
+          getValue: (product) => {
+            if (!product || !product.model) return '—';
+            const model = product.model.toLowerCase();
+            if (model.includes('series 10'))
+              return '802.11ax (Wi-Fi 6) 2.4GHz и 5GHz';
+            return '802.11b/g/n 2.4GHz и 5GHz';
+          }
+        }
+      ]
+    }
+  ];
+
+  // Функция для отображения характеристик в зависимости от типа продукта
+  const renderSpecifications = () => {
+    if (activeTab === 'iphone') {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {comparisonSpecs.map((spec) => (
+            <div key={spec.key} className="border-t border-gray-200 pt-8">
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <img
+                    src={spec.getIcon ? spec.getIcon(selectedProduct) : spec.icon}
+                    alt={spec.label}
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900">{spec.label}</h3>
+              </div>
+              <div className="space-y-4">
+                {spec.subSpecs.map((subSpec) => (
+                  <div key={subSpec.key} className="flex items-center justify-between px-4">
+                    <div className="flex items-center gap-2">
+                      {(subSpec.getIcon || subSpec.icon) && (
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          <img
+                            src={subSpec.getIcon ? subSpec.getIcon(selectedProduct) : subSpec.icon}
+                            alt={subSpec.label}
+                            className="w-5 h-5 object-contain"
+                          />
+                        </div>
+                      )}
+                      <span className="text-sm font-medium text-gray-900 min-w-[200px]">
+                        {subSpec.label}
+                      </span>
+                    </div>
+                    {subSpec.type === 'boolean' ? (
+                      <div className="flex items-center justify-center w-8 h-8">
+                        {subSpec.getValue ? subSpec.getValue(selectedProduct) ? <CheckIcon /> : <MinusIcon /> : (selectedProduct[subSpec.key] ? <CheckIcon /> : <MinusIcon />)}
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-600 font-medium">
+                        {subSpec.getValue ? subSpec.getValue(selectedProduct) : (selectedProduct[subSpec.key] || '—')}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    } else if (activeTab === 'airpods') {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {airpodsComparisonSpecs.map((spec) => (
+            <div key={spec.key} className="border-t border-gray-200 pt-8">
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <img
+                    src={spec.getIcon()}
+                    alt={spec.label}
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900">{spec.label}</h3>
+              </div>
+              <div className="space-y-4">
+                {spec.subSpecs.map((subSpec) => (
+                  <div key={subSpec.key} className="flex items-center justify-between px-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 flex items-center justify-center">
+                        <img
+                          src={subSpec.icon}
+                          alt={subSpec.label}
+                          className="w-5 h-5 object-contain"
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 min-w-[200px]">
+                        {subSpec.label}
+                      </span>
+                    </div>
+                    {subSpec.type === 'boolean' ? (
+                      <div className="flex items-center justify-center w-8 h-8">
+                        {subSpec.getValue(selectedProduct) ? <CheckIcon /> : <MinusIcon />}
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-600 font-medium">
+                        {subSpec.getValue(selectedProduct)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    } else if (activeTab === 'watch') {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {watchComparisonSpecs.map((spec) => (
+            <div key={spec.key} className="border-t border-gray-200 pt-8">
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <img
+                    src={spec.getIcon()}
+                    alt={spec.label}
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900">{spec.label}</h3>
+              </div>
+              <div className="space-y-4">
+                {spec.subSpecs.map((subSpec) => (
+                  <div key={subSpec.key} className="flex items-center justify-between px-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 flex items-center justify-center">
+                        <img
+                          src={subSpec.icon}
+                          alt={subSpec.label}
+                          className="w-5 h-5 object-contain"
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 min-w-[200px]">
+                        {subSpec.label}
+                      </span>
+                    </div>
+                    {subSpec.type === 'boolean' ? (
+                      <div className="flex items-center justify-center w-8 h-8">
+                        {subSpec.getValue(selectedProduct) ? <CheckIcon /> : <MinusIcon />}
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-600 font-medium">
+                        {subSpec.getValue(selectedProduct)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -506,24 +1362,78 @@ const ComparePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-8">
-        <h1 className="text-4xl font-semibold text-black mb-8 text-center mt-12">Характеристики iPhone</h1>
-        
+      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-12">
+        {/* Title */}
+        <h1 className="text-center text-2xl font-medium text-gray-900 mb-4">
+          Сравнить
+        </h1>
+
+        {/* Comparison Type Buttons */}
+        <div className="flex justify-center gap-2 mb-4">
+          <button
+            onClick={() => handleTabChange('iphone')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeTab === 'iphone'
+                ? 'bg-[#0071e3] text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            iPhone
+          </button>
+          <button
+            onClick={() => handleTabChange('airpods')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeTab === 'airpods'
+                ? 'bg-[#0071e3] text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            AirPods
+          </button>
+          <button
+            onClick={() => handleTabChange('watch')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeTab === 'watch'
+                ? 'bg-[#0071e3] text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Apple Watch
+          </button>
+        </div>
+
         {/* Product Selection */}
         <div className="mb-8 text-center">
-          <div className="dropdown-container">
-            <div className="relative">
-              <button
-                className="w-full p-4 bg-white border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:border-[#0071e3] text-center text-lg hover:border-[#0071e3] transition-colors"
-                onClick={() => setOpenDropdown(!openDropdown)}
-              >
-                {selectedProduct?.model || 'Выберите iPhone'}
-              </button>
+          <div className="dropdown-container relative">
+            <button
+              className="w-full p-4 bg-white border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:border-[#0071e3] text-center text-lg hover:border-[#0071e3] transition-colors"
+              onClick={() => setOpenDropdown(!openDropdown)}
+            >
+              {selectedProduct?.model || `Выберите ${
+                activeTab === 'iphone' ? 'iPhone' : 
+                activeTab === 'airpods' ? 'AirPods' : 'Apple Watch'
+              }`}
+            </button>
 
-              {/* Dropdown Menu */}
-              {openDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
-                  {products.map((product) => (
+            {/* Debug info */}
+            {error && (
+              <div className="text-red-500 mt-2">
+                Error: {error}
+              </div>
+            )}
+
+            {/* Loading indicator */}
+            {loading && (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#0071e3] mx-auto"></div>
+              </div>
+            )}
+
+            {/* Dropdown Menu */}
+            {openDropdown && !loading && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
+                {products.length > 0 ? (
+                  products.map((product) => (
                     <button
                       key={product._id}
                       className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors text-gray-900"
@@ -531,23 +1441,33 @@ const ComparePage = () => {
                     >
                       <div className="flex flex-col">
                         <span className="font-medium">{product.model}</span>
-                        <span className="text-sm text-gray-500">{product.processor}</span>
+                        <span className="text-sm text-gray-500">
+                          {activeTab === 'iphone' ? product.processor : 
+                           activeTab === 'watch' ? product.size : ''}
+                        </span>
                       </div>
                     </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-gray-500">
+                    Нет доступных моделей
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-            {selectedProduct && (
-              <div className="mt-6">
-                <div className="w-[240px] h-[240px] mx-auto flex items-center justify-center mb-4">
-                  <img
-                    src={selectedProduct.image}
-                    alt={selectedProduct.model}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </div>
+          {/* Selected Product Display */}
+          {selectedProduct && (
+            <div className="mt-6">
+              <div className="w-[240px] h-[240px] mx-auto flex items-center justify-center mb-4">
+                <img
+                  src={selectedProduct.image}
+                  alt={selectedProduct.model}
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+              {selectedProduct.colors && (
                 <div className="flex flex-wrap justify-center gap-2">
                   {selectedProduct.colors.map((color, colorIndex) => (
                     <div
@@ -558,90 +1478,34 @@ const ComparePage = () => {
                     />
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Specifications */}
-        {selectedProduct && (
-          <div className="border-t border-gray-200 pt-8">
-            <h2 className="text-2xl font-semibold mb-8 text-center">Характеристики</h2>
-            
-            {/* Display Size */}
-            <div className="text-center mb-12">
-              <div className="flex flex-col items-center">
-                <span className="text-4xl font-medium mb-2">{selectedProduct.screenSize}"</span>
-                <span className="text-sm text-gray-500">Дисплей Super Retina XDR</span>
-                {selectedProduct.promotion && (
-                  <span className="text-sm text-gray-500">Технология ProMotion</span>
-                )}
-                {selectedProduct.dynamicIsland && (
-                  <span className="text-sm text-gray-500">Dynamic Island</span>
-                )}
-              </div>
-            </div>
-
-            {/* Detailed Specs */}
-            <div className="space-y-12">
-              {comparisonSpecs.map((spec) => (
-                <div key={spec.key} className="border-t border-gray-200 pt-8">
-                  <div className="flex items-center justify-center gap-4 mb-8">
-                    <div className="w-12 h-12 flex items-center justify-center">
-                      <img
-                        src={spec.getIcon ? spec.getIcon(selectedProduct) : spec.icon}
-                        alt={spec.label}
-                        className="w-8 h-8 object-contain"
-                      />
-                    </div>
-                    <h3 className="text-xl font-medium text-gray-900">{spec.label}</h3>
-                  </div>
-                  <div className="space-y-4">
-                    {spec.subSpecs.map((subSpec) => (
-                      <div key={subSpec.key} className="flex items-center justify-between px-4">
-                        <div className="flex items-center gap-2">
-                          {(subSpec.getIcon || subSpec.icon) && (
-                            <div className="w-6 h-6 flex items-center justify-center">
-                              <img
-                                src={subSpec.getIcon ? subSpec.getIcon(selectedProduct) : subSpec.icon}
-                                alt={subSpec.label}
-                                className="w-5 h-5 object-contain"
-                              />
-                            </div>
-                          )}
-                          <span className="text-sm font-medium text-gray-900 min-w-[200px]">
-                            {subSpec.label}
-                          </span>
-                        </div>
-                        {subSpec.type === 'boolean' ? (
-                          <div className="flex items-center justify-center w-8 h-8">
-                            {subSpec.getValue ? subSpec.getValue(selectedProduct) ? <CheckIcon /> : <MinusIcon /> : (selectedProduct[subSpec.key] ? <CheckIcon /> : <MinusIcon />)}
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-600 font-medium">
-                            {subSpec.getValue ? subSpec.getValue(selectedProduct) : (selectedProduct[subSpec.key] || '—')}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {!loading && selectedProduct && (
+          <>
+            {activeTab === 'iphone' && renderSpecifications()}
+            {activeTab === 'airpods' && renderSpecifications()}
+            {activeTab === 'watch' && renderSpecifications()}
+          </>
         )}
 
         {/* Empty State */}
-        {!selectedProduct && (
+        {!selectedProduct && !loading && (
           <div className="text-center py-12">
             <p className="text-xl text-gray-600 mb-4">
-              Выберите iPhone для просмотра характеристик
+              Выберите {
+                activeTab === 'iphone' ? 'iPhone' : 
+                activeTab === 'airpods' ? 'AirPods' : 'Apple Watch'
+              } для просмотра характеристик
             </p>
             <Link
-              to="/iphone"
+              to={`/${activeTab}`}
               className="text-[#0071e3] hover:text-[#0077ed] transition-colors duration-300"
             >
-              Вернуться к каталогу iPhone
+              Вернуться к каталогу
             </Link>
           </div>
         )}
